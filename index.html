@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>東京都立高校入試 得点シミュレーター</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    background: #f4f6f8;
+    color: #222;
+    margin: 0;
+    padding: 16px;
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 1.4rem;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  .card h2 {
+    font-size: 1.05rem;
+    margin-top: 0;
+    margin-bottom: 12px;
+    border-left: 5px solid #2b6cb0;
+    padding-left: 8px;
+  }
+  .grade-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .grade-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9fafb;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+  .grade-item.skill {
+    background: #fff7ed;
+    border-color: #fed7aa;
+  }
+  .grade-item label {
+    font-size: 0.9rem;
+  }
+  select, input[type=number] {
+    font-size: 1rem;
+    padding: 4px 6px;
+    border-radius: 5px;
+    border: 1px solid #cbd5e0;
+    width: 70px;
+  }
+  .note {
+    font-size: 0.8rem;
+    color: #718096;
+    margin-top: 4px;
+  }
+  .result-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .result-item {
+    flex: 1 1 140px;
+    background: #ebf8ff;
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .result-item .label {
+    font-size: 0.8rem;
+    color: #2c5282;
+  }
+  .result-item .value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #1a365d;
+  }
+  .ratio-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .big-result {
+    background: #f0fff4;
+    border: 2px solid #38a169;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .big-result.warning {
+    background: #fff5f5;
+    border-color: #e53e3e;
+  }
+  .big-result .value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #22543d;
+  }
+  .big-result.warning .value {
+    color: #822727;
+  }
+  .big-result .caption {
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin-top: 4px;
+  }
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .subject-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9fafb;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+  .sum-line {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 1rem;
+  }
+  .diff-ok { color: #22863a; font-weight: bold; }
+  .diff-ng { color: #cb2431; font-weight: bold; }
+  footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #a0aec0;
+    margin-top: 24px;
+    margin-bottom: 40px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>東京都立高校入試 得点シミュレーター</h1>
+  <p class="subtitle">内申点と目標点を入力すると、当日の学力検査で必要な点数がわかります</p>
+
+  <!-- 内申点入力 -->
+  <div class="card">
+    <h2>① 内申点を入力してください</h2>
+    <p class="note">中学3年生の2学期(または後期前半)の通知表の評定(5段階)を選んでください。</p>
+
+    <p class="note" style="margin-top:14px; font-weight:bold;">主要5教科(そのまま合計します)</p>
+    <div class="grade-grid" id="mainSubjects"></div>
+
+    <p class="note" style="font-weight:bold;">実技4教科(2倍にして合計します)</p>
+    <div class="grade-grid" id="skillSubjects"></div>
+
+    <div class="result-box">
+      <div class="result-item">
+        <div class="label">換算内申(65点満点)</div>
+        <div class="value" id="kanzanNaishin">-</div>
+      </div>
+      <div class="result-item">
+        <div class="label">調査書点(300点満点に換算)</div>
+        <div class="value" id="kanzanNaishin300">-</div>
+      </div>
+    </div>
+    <p class="note">換算内申 = 主要5教科の内申の合計 + 実技4教科の内申の合計 × 2</p>
+  </div>
+
+  <!-- 比率設定 -->
+  <div class="card">
+    <h2>② 学力検査と調査書の比率</h2>
+    <p class="note">都立高校の一般入試では、学校ごとに「学力検査:調査書」の比率が決まっています。分からない場合は、多くの高校で採用されている「7:3」のままで大丈夫です(志望校の募集要項で確認できます)。</p>
+    <div class="ratio-row">
+      <label for="ratioSelect">比率:</label>
+      <select id="ratioSelect">
+        <option value="7:3" selected>7 : 3(標準・多くの高校)</option>
+        <option value="6:4">6 : 4</option>
+        <option value="3:7">3 : 7(実技系学科など)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 目標点入力 -->
+  <div class="card">
+    <h2>③ 目標の総合得点を入力してください</h2>
+    <p class="note">総合得点は1000点満点です。志望校の合格ラインの目安が分かれば入力しましょう。</p>
+    <div class="ratio-row">
+      <label for="targetTotal">目標総合得点(1000点満点):</label>
+      <input type="number" id="targetTotal" min="0" max="1000" value="700">
+    </div>
+
+    <div class="big-result" id="bigResultBox">
+      <div class="value" id="requiredScore500">-</div>
+      <div class="caption">当日の学力検査(500点満点)で必要な得点</div>
+    </div>
+
+    <div class="result-box">
+      <div class="result-item">
+        <div class="label">学力検査 換算点(満点<span id="examMax"></span>点)</div>
+        <div class="value" id="requiredExamKanzan">-</div>
+      </div>
+      <div class="result-item">
+        <div class="label">調査書 換算点(満点<span id="shoshoMax"></span>点)</div>
+        <div class="value" id="choushoKanzanShow">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 教科別目標点 -->
+  <div class="card">
+    <h2>④ 教科別の目標点を考えてみましょう</h2>
+    <p class="note">学力検査は国語・数学・英語・社会・理科の5教科、各100点満点です。それぞれ何点を目指すか入力すると、合計が必要点数に届くか確認できます。</p>
+    <div class="subject-grid" id="examSubjects"></div>
+    <div class="sum-line">
+      教科別目標点の合計: <span id="subjectSum">0</span> 点 /
+      必要点数: <span id="requiredScoreRef">-</span> 点
+      &nbsp;→&nbsp;<span id="subjectDiff"></span>
+    </div>
+  </div>
+
+  <footer>
+    ※ このシミュレーターは目安を計算する簡易ツールです。実際の選抜方法・比率・配点は志望校の募集要項で必ず確認してください。
+  </footer>
+</div>
+
+<script>
+const MAIN_SUBJECTS = ["国語", "社会", "数学", "理科", "英語"];
+const SKILL_SUBJECTS = ["音楽", "美術", "保健体育", "技術・家庭"];
+const EXAM_SUBJECTS = ["国語", "数学", "英語", "社会", "理科"];
+
+function buildGradeSelect(id) {
+  let opts = "";
+  for (let v = 5; v >= 1; v--) {
+    opts += `<option value="${v}" ${v === 3 ? "selected" : ""}>${v}</option>`;
+  }
+  return `<select id="${id}">${opts}</select>`;
+}
+
+function initGradeInputs() {
+  const mainDiv = document.getElementById("mainSubjects");
+  MAIN_SUBJECTS.forEach((name, i) => {
+    const id = `main_${i}`;
+    mainDiv.innerHTML += `<div class="grade-item"><label for="${id}">${name}</label>${buildGradeSelect(id)}</div>`;
+  });
+
+  const skillDiv = document.getElementById("skillSubjects");
+  SKILL_SUBJECTS.forEach((name, i) => {
+    const id = `skill_${i}`;
+    skillDiv.innerHTML += `<div class="grade-item skill"><label for="${id}">${name}</label>${buildGradeSelect(id)}</div>`;
+  });
+}
+
+function initExamSubjectInputs() {
+  const div = document.getElementById("examSubjects");
+  EXAM_SUBJECTS.forEach((name, i) => {
+    const id = `exam_${i}`;
+    div.innerHTML += `<div class="subject-item"><label for="${id}">${name}</label><input type="number" id="${id}" min="0" max="100" value="70"></div>`;
+  });
+}
+
+function getMainSum() {
+  return MAIN_SUBJECTS.reduce((sum, _, i) => sum + Number(document.getElementById(`main_${i}`).value), 0);
+}
+
+function getSkillSum() {
+  return SKILL_SUBJECTS.reduce((sum, _, i) => sum + Number(document.getElementById(`skill_${i}`).value), 0);
+}
+
+function getRatio() {
+  const [a, b] = document.getElementById("ratioSelect").value.split(":").map(Number);
+  return { a, b };
+}
+
+function calcAndRender() {
+  const mainSum = getMainSum();
+  const skillSum = getSkillSum();
+  const kanzanNaishin = mainSum + skillSum * 2; // 65点満点
+  const kanzanNaishin300 = (kanzanNaishin / 65) * 300;
+
+  document.getElementById("kanzanNaishin").textContent = `${kanzanNaishin} / 65点`;
+  document.getElementById("kanzanNaishin300").textContent = `${kanzanNaishin300.toFixed(1)} 点`;
+
+  const { a, b } = getRatio();
+  const examMax = 100 * a;   // 学力検査換算点の満点
+  const shoshoMax = 100 * b; // 調査書換算点の満点
+
+  document.getElementById("examMax").textContent = examMax;
+  document.getElementById("shoshoMax").textContent = shoshoMax;
+
+  const choushoKanzan = kanzanNaishin300 * (b / 3);
+  document.getElementById("choushoKanzanShow").textContent = `${choushoKanzan.toFixed(1)} 点`;
+
+  const targetTotal = Number(document.getElementById("targetTotal").value) || 0;
+
+  // 必要な学力検査換算点
+  const requiredExamKanzan = targetTotal - choushoKanzan;
+  // 学力検査の生得点(500点満点)に逆算: 換算点 = 生得点 × (a/5)
+  const requiredRaw500 = requiredExamKanzan / (a / 5);
+
+  const bigBox = document.getElementById("bigResultBox");
+  const requiredScoreEl = document.getElementById("requiredScore500");
+  const captionEl = bigBox.querySelector(".caption");
+
+  if (requiredRaw500 <= 0) {
+    bigBox.classList.remove("warning");
+    requiredScoreEl.textContent = "0点でOK";
+    captionEl.textContent = "今の内申点だけで、目標の総合得点に届いています";
+  } else if (requiredRaw500 > 500) {
+    bigBox.classList.add("warning");
+    const shortage = (requiredRaw500 - 500).toFixed(1);
+    requiredScoreEl.textContent = "届きません";
+    captionEl.textContent = `学力検査で500点(満点)を取っても、目標まで換算点で約${shortage.replace(".0","")}点足りません。内申を上げるか、目標を見直しましょう`;
+  } else {
+    bigBox.classList.remove("warning");
+    requiredScoreEl.textContent = `${Math.ceil(requiredRaw500)} 点`;
+    captionEl.textContent = "当日の学力検査(500点満点)で必要な得点";
+  }
+
+  document.getElementById("requiredExamKanzan").textContent =
+    requiredExamKanzan > 0 ? `${requiredExamKanzan.toFixed(1)} 点` : "0.0 点";
+
+  // 教科別目標点の合計
+  const subjectSum = EXAM_SUBJECTS.reduce((sum, _, i) => sum + Number(document.getElementById(`exam_${i}`).value || 0), 0);
+  document.getElementById("subjectSum").textContent = subjectSum;
+
+  const requiredRefText = (requiredRaw500 > 0 && requiredRaw500 <= 500) ? Math.ceil(requiredRaw500) : (requiredRaw500 <= 0 ? 0 : 500);
+  document.getElementById("requiredScoreRef").textContent = requiredRaw500 <= 500 ? requiredRefText : "500(上限)";
+
+  const diffEl = document.getElementById("subjectDiff");
+  const target = requiredRaw500 <= 0 ? 0 : Math.min(requiredRaw500, 500);
+  const diff = subjectSum - target;
+  if (diff >= 0) {
+    diffEl.textContent = `目標達成ライン以上です(+${diff.toFixed(1)}点の余裕)`;
+    diffEl.className = "diff-ok";
+  } else {
+    diffEl.textContent = `あと${Math.abs(diff).toFixed(1)}点足りません`;
+    diffEl.className = "diff-ng";
+  }
+}
+
+function attachListeners() {
+  document.querySelectorAll("select, input").forEach(el => {
+    el.addEventListener("input", calcAndRender);
+    el.addEventListener("change", calcAndRender);
+  });
+}
+
+initGradeInputs();
+initExamSubjectInputs();
+attachListeners();
+calcAndRender();
+</script>
+</body>
+</html>

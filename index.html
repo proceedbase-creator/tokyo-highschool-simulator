@@ -371,11 +371,10 @@
   .diff-ng { color: var(--brick); }
 
   /* ---------- step5 school lookup ---------- */
-  .school-search {
-    position: relative;
+  .school-picker {
     margin-bottom: 18px;
   }
-  .school-search input {
+  .school-picker input {
     width: 100%;
     border: 1px solid var(--line-strong);
     border-radius: 3px;
@@ -386,11 +385,100 @@
     min-height: 52px;
     color: var(--navy);
   }
-  .school-search input:focus { outline: 2px solid var(--brick); outline-offset: 1px; }
-  .school-search .hint {
-    margin: 6px 0 0;
+  .school-picker input:focus { outline: 2px solid var(--brick); outline-offset: 1px; }
+  .school-picker .hint {
+    margin: 10px 0 0;
     font-size: 0.78rem;
     color: var(--sub);
+  }
+
+  .category-chip-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+  .category-chip {
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--sub);
+    background: #fff;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    padding: 8px 16px;
+    min-height: 40px;
+    cursor: pointer;
+  }
+  .category-chip.is-active {
+    border-color: var(--brick);
+    color: var(--brick);
+    background: #fdf4f2;
+  }
+  .category-chip:focus-visible { outline: 2px solid var(--navy); outline-offset: 1px; }
+
+  .school-list {
+    margin-top: 14px;
+    max-height: 380px;
+    overflow-y: auto;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--line);
+    -webkit-overflow-scrolling: touch;
+  }
+  .school-list-group-label {
+    position: sticky;
+    top: 0;
+    background: #fdfcf9;
+    font-size: 0.78rem;
+    color: var(--sub);
+    padding: 8px 6px 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  .school-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    padding: 14px 8px;
+    min-height: 54px;
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .school-list-item .item-name-wrap { display: flex; flex-direction: column; gap: 2px; }
+  .school-list-item .item-dept {
+    font-size: 0.78rem;
+    color: var(--sub);
+    font-weight: 400;
+  }
+  .school-list-item .item-score {
+    font-family: "Shippori Mincho", serif;
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 1.05rem;
+    white-space: nowrap;
+  }
+  .school-list-item:hover, .school-list-item:focus-visible {
+    background: #faf7f0;
+    outline: none;
+  }
+  .school-list-item.is-selected {
+    border-left: 4px solid var(--brick);
+    padding-left: 6px;
+    background: #fdf4f2;
+  }
+  .school-list-item.is-selected .item-score { color: var(--brick); }
+  .school-list-empty {
+    padding: 22px 6px;
+    text-align: center;
+    color: var(--sub);
+    font-size: 0.9rem;
   }
   .school-empty {
     padding: 18px 4px;
@@ -560,8 +648,6 @@
 
     .diff-line { margin-top: 5px; }
 
-    .school-search { margin-bottom: 8px; }
-    .school-search input { min-height: 30px; padding: 6px 10px; font-size: 1rem; }
     .school-card-head { padding-top: 8px; }
     .school-card-head .name { font-size: 1.15rem; }
     .school-meta-row { margin: 8px 0 8px; }
@@ -698,13 +784,19 @@
       </div>
       <p class="lead">「進研Vもぎ 令和9年度受験用【暫定版6月時点】都立高校 総合得点 合格めやす表」(2026年6月時点データ、進学研究会)をもとにした、合格可能性60%の目安です。学校名を入力すると、その学校の目安と、今の内申から必要な当日点が分かります。※このデータはまだ解析中の暫定値のため、今後基準が変わる場合があります。最新の基準値は8・9月以降のVもぎで確認してください。</p>
 
-      <div class="school-search">
-        <input type="text" id="schoolSearch" list="schoolList" placeholder="学校名を入力(例:戸山)" autocomplete="off">
-        <datalist id="schoolList"></datalist>
-        <p class="hint">同じ学校で学科が複数ある場合は、学科名まで選ぶと絞り込めます。</p>
+      <div class="school-picker no-print">
+        <input type="text" id="schoolSearch" placeholder="学校名で検索(例:戸山)" autocomplete="off" inputmode="search">
+        <div class="category-chip-group" id="categoryChips">
+          <button type="button" class="category-chip is-active" data-category="all">すべて</button>
+          <button type="button" class="category-chip" data-category="普通科">普通科</button>
+          <button type="button" class="category-chip" data-category="専門学科">専門学科</button>
+          <button type="button" class="category-chip" data-category="総合学科・その他">総合学科・その他</button>
+        </div>
+        <p class="hint">学校名を入力するか、一覧からタップして選べます。同じ学校で学科が複数ある場合は学科名も表示されます。</p>
+        <div class="school-list" id="schoolResultsList"></div>
       </div>
 
-      <p class="school-empty" id="schoolEmpty">学校名を入力すると、ここに合格めやすが表示されます。</p>
+      <p class="school-empty" id="schoolEmpty">学校名を入力するか、一覧からタップすると、ここに合格めやすが表示されます。</p>
 
       <div class="school-card" id="schoolCard">
         <div class="school-card-head">
@@ -1081,16 +1173,69 @@ function calcAndRender() {
   renderSchoolResult();
 }
 
-function schoolKey(row) {
-  return `${row.school}(${row.dept})`;
+let selectedSchool = null;
+let activeCategory = "all";
+
+function matchesCategory(row, category) {
+  if (category === "all") return true;
+  if (category === "普通科") return row.category.startsWith("普通科");
+  return row.category === category;
 }
 
-function initSchoolList() {
-  const listEl = document.getElementById("schoolList");
-  SCHOOL_DATA.forEach(row => {
-    const opt = document.createElement("option");
-    opt.value = schoolKey(row);
-    listEl.appendChild(opt);
+function renderSchoolList() {
+  const listEl = document.getElementById("schoolResultsList");
+  const keyword = document.getElementById("schoolSearch").value.trim();
+
+  const matched = SCHOOL_DATA.filter(row => {
+    if (!matchesCategory(row, activeCategory)) return false;
+    if (!keyword) return true;
+    return row.school.includes(keyword) || row.dept.includes(keyword);
+  });
+
+  if (matched.length === 0) {
+    listEl.innerHTML = `<p class="school-list-empty">あてはまる学校が見つかりません。検索キーワードや絞り込みを変えてみてください。</p>`;
+    return;
+  }
+
+  let lastCategory = null;
+  const html = [];
+  matched.forEach((row, i) => {
+    if (row.category !== lastCategory) {
+      html.push(`<p class="school-list-group-label">${row.category}</p>`);
+      lastCategory = row.category;
+    }
+    const idx = SCHOOL_DATA.indexOf(row);
+    const isSelected = selectedSchool === row;
+    html.push(
+      `<button type="button" class="school-list-item${isSelected ? " is-selected" : ""}" data-index="${idx}">` +
+        `<span class="item-name-wrap"><span>${row.school}</span><span class="item-dept">${row.dept}</span></span>` +
+        `<span class="item-score">${row.score60}<small style="font-family:'Noto Sans JP',sans-serif;font-weight:400;color:var(--sub);"> 点</small></span>` +
+      `</button>`
+    );
+  });
+  listEl.innerHTML = html.join("");
+
+  listEl.querySelectorAll(".school-list-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedSchool = SCHOOL_DATA[Number(btn.dataset.index)];
+      renderSchoolList();
+      renderSchoolResult();
+    });
+  });
+}
+
+function initSchoolPicker() {
+  renderSchoolList();
+
+  document.getElementById("schoolSearch").addEventListener("input", renderSchoolList);
+
+  document.querySelectorAll(".category-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll(".category-chip").forEach(c => c.classList.remove("is-active"));
+      chip.classList.add("is-active");
+      activeCategory = chip.dataset.category;
+      renderSchoolList();
+    });
   });
 }
 
@@ -1125,10 +1270,9 @@ function renderSchoolLine(prefix, targetTotal) {
 function renderSchoolResult() {
   const card = document.getElementById("schoolCard");
   const empty = document.getElementById("schoolEmpty");
-  const input = document.getElementById("schoolSearch");
-  if (!input) return;
+  if (!card) return;
 
-  const row = SCHOOL_DATA.find(r => schoolKey(r) === input.value.trim());
+  const row = selectedSchool;
 
   if (!row) {
     card.classList.remove("is-visible");
@@ -1163,7 +1307,7 @@ function setDefaultDate() {
 
 initGradeInputs();
 initExamSubjectInputs();
-initSchoolList();
+initSchoolPicker();
 attachListeners();
 setDefaultDate();
 calcAndRender();

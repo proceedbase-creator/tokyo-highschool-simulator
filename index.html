@@ -561,6 +561,33 @@
     font-size: 0.78rem;
     color: var(--sub);
   }
+  .use-target-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .use-target-button {
+    flex: 1 1 220px;
+    font-family: "Noto Sans JP", sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--navy);
+    background: #fff;
+    border: 1px solid var(--navy);
+    border-radius: 3px;
+    padding: 12px 14px;
+    min-height: 48px;
+    cursor: pointer;
+  }
+  .use-target-button:hover { background: #f2f3f5; }
+  .use-target-button:active { background: var(--navy); color: #fff; }
+  .target-source-note {
+    margin: 10px 0 0;
+    font-size: 0.82rem;
+    color: var(--brick);
+    min-height: 1em;
+  }
 
   /* ---------- footer ---------- */
   .sheet-footer {
@@ -734,11 +761,12 @@
         <span class="step-no">STEP 3</span>
         <h2>目標にする総合得点を入力します</h2>
       </div>
-      <p class="lead">総合得点は1000点満点です。志望校の合格ラインの目安を入力しましょう。</p>
+      <p class="lead">総合得点は1000点満点です。志望校の合格ラインの目安を入力しましょう。STEP5で志望校を選ぶと、ここに自動で入力することもできます。</p>
       <div class="inline-field">
         <input type="number" id="targetTotal" inputmode="numeric" value="700" class="fill-blank fill-blank--wide">
         <span class="inline-suffix">点 ／ 1000点満点</span>
       </div>
+      <p class="target-source-note" id="targetSourceNote"></p>
 
       <div class="headline-result" id="bigResultBox">
         <p class="headline-label">当日の学力検査(500点満点)で必要な得点</p>
@@ -835,6 +863,11 @@
             </tr>
           </tbody>
         </table>
+        </div>
+
+        <div class="use-target-row no-print">
+          <button type="button" class="use-target-button" id="useLine60Button">60%ラインをSTEP3の目標にする</button>
+          <button type="button" class="use-target-button" id="useLine80Button">80%ラインをSTEP3の目標にする</button>
         </div>
         <p class="eighty-note">※80%ラインは、資料に記載された60%ラインの総合得点に <strong id="eightyMarginShow">20</strong> 点を加えて、このアプリが独自に算出した目安です(資料に直接記載された数値ではありません)。</p>
       </div>
@@ -1237,6 +1270,9 @@ function initSchoolPicker() {
       renderSchoolList();
     });
   });
+
+  document.getElementById("useLine60Button").addEventListener("click", () => applyTargetFromSchool(60));
+  document.getElementById("useLine80Button").addEventListener("click", () => applyTargetFromSchool(80));
 }
 
 // STEP5の収録校はすべて「学力検査:調査書=7:3」の学校のため、比率は7:3で固定して計算する。
@@ -1293,6 +1329,29 @@ function renderSchoolResult() {
   renderSchoolLine("line80", row.score60 + EIGHTY_PERCENT_MARGIN);
 }
 
+let targetSourceValue = null;
+
+function applyTargetFromSchool(percent) {
+  if (!selectedSchool) return;
+  const value = percent === 80 ? selectedSchool.score60 + EIGHTY_PERCENT_MARGIN : selectedSchool.score60;
+  const input = document.getElementById("targetTotal");
+  input.value = value;
+  targetSourceValue = value;
+  document.getElementById("targetSourceNote").textContent =
+    `※ ${selectedSchool.school}(${selectedSchool.dept})の${percent}%ラインの総合得点(${value}点)を目標に設定しました。`;
+  calcAndRender();
+  document.getElementById("step3").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function initTargetSourceTracking() {
+  document.getElementById("targetTotal").addEventListener("input", () => {
+    if (Number(document.getElementById("targetTotal").value) !== targetSourceValue) {
+      document.getElementById("targetSourceNote").textContent = "";
+      targetSourceValue = null;
+    }
+  });
+}
+
 function attachListeners() {
   document.querySelectorAll("select, input").forEach(el => {
     el.addEventListener("input", calcAndRender);
@@ -1308,6 +1367,7 @@ function setDefaultDate() {
 initGradeInputs();
 initExamSubjectInputs();
 initSchoolPicker();
+initTargetSourceTracking();
 attachListeners();
 setDefaultDate();
 calcAndRender();

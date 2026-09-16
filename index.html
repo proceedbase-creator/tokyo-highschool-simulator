@@ -370,6 +370,110 @@
   .diff-ok { color: #2f6f4f; }
   .diff-ng { color: var(--brick); }
 
+  /* ---------- step5 school lookup ---------- */
+  .school-search {
+    position: relative;
+    margin-bottom: 18px;
+  }
+  .school-search input {
+    width: 100%;
+    border: 1px solid var(--line-strong);
+    border-radius: 3px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 1.15rem;
+    padding: 12px 14px;
+    min-height: 52px;
+    color: var(--navy);
+  }
+  .school-search input:focus { outline: 2px solid var(--brick); outline-offset: 1px; }
+  .school-search .hint {
+    margin: 6px 0 0;
+    font-size: 0.78rem;
+    color: var(--sub);
+  }
+  .school-empty {
+    padding: 18px 4px;
+    color: var(--sub);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--line);
+  }
+  .school-card { display: none; }
+  .school-card.is-visible { display: block; }
+  .school-card-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--ink);
+    padding-top: 14px;
+    margin-bottom: 4px;
+  }
+  .school-card-head .name {
+    font-family: "Shippori Mincho", serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .school-card-head .dept {
+    font-size: 0.95rem;
+    color: var(--sub);
+  }
+  .school-card-note {
+    margin: 4px 0 18px;
+    font-size: 0.78rem;
+    color: var(--sub);
+  }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+  .compare-table th, .compare-table td {
+    border-bottom: 1px solid var(--line);
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .compare-table th {
+    font-weight: 400;
+    color: var(--sub);
+    font-size: 0.82rem;
+  }
+  .compare-table td.row-label {
+    text-align: left;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .compare-table .line-80 td.row-label { color: var(--brick); }
+  .compare-table td.figure {
+    font-family: "Shippori Mincho", serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--navy);
+  }
+  .compare-table .line-80 td.figure { color: var(--brick); }
+  .compare-table td.figure .unit {
+    font-family: "Noto Sans JP", sans-serif;
+    font-weight: 400;
+    font-size: 0.75rem;
+    color: var(--sub);
+    margin-left: 2px;
+  }
+  .school-meta-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin: 14px 0 18px;
+    font-size: 0.88rem;
+    color: var(--sub);
+  }
+  .school-meta-row strong { color: var(--navy); font-weight: 700; }
+  .eighty-note {
+    margin: 14px 0 0;
+    font-size: 0.78rem;
+    color: var(--sub);
+  }
+
   /* ---------- footer ---------- */
   .sheet-footer {
     margin-top: 44px;
@@ -455,6 +559,15 @@
     .subject-item .fill-blank { width: 3.4rem; }
 
     .diff-line { margin-top: 5px; }
+
+    .school-search { margin-bottom: 8px; }
+    .school-search input { min-height: 30px; padding: 6px 10px; font-size: 1rem; }
+    .school-card-head { padding-top: 8px; }
+    .school-card-head .name { font-size: 1.15rem; }
+    .school-meta-row { margin: 8px 0 8px; }
+    .compare-table th, .compare-table td { padding: 6px 8px; }
+    .compare-table td.figure { font-size: 1.05rem; }
+    .school-card-note, .eighty-note { margin-top: 6px; }
 
     .sheet-footer { margin-top: 7px; padding-top: 5px; }
   }
@@ -578,8 +691,66 @@
       <p class="diff-line" id="subjectDiff"></p>
     </section>
 
+    <section class="step" id="step5">
+      <div class="step-heading">
+        <span class="step-no">STEP 5</span>
+        <h2>志望校を選んで合格めやすと比べてみましょう</h2>
+      </div>
+      <p class="lead">「進研Vもぎ 令和8年度受験用【暫定版6月時点】都立高校 総合得点 合格めやす表」(2025年9月時点データ、進学研究会)をもとにした、合格可能性60%の目安です。学校名を入力すると、その学校の目安と、今の内申から必要な当日点が分かります。</p>
+
+      <div class="school-search">
+        <input type="text" id="schoolSearch" list="schoolList" placeholder="学校名を入力(例:戸山)" autocomplete="off">
+        <datalist id="schoolList"></datalist>
+        <p class="hint">同じ学校で学科が複数ある場合は、学科名まで選ぶと絞り込めます。</p>
+      </div>
+
+      <p class="school-empty" id="schoolEmpty">学校名を入力すると、ここに合格めやすが表示されます。</p>
+
+      <div class="school-card" id="schoolCard">
+        <div class="school-card-head">
+          <span class="name" id="cardSchoolName"></span>
+          <span class="dept" id="cardSchoolDept"></span>
+        </div>
+        <p class="school-card-note" id="cardSchoolNote"></p>
+
+        <div class="school-meta-row">
+          <span>表の基準内申(65点満点):<strong id="cardNaishin65"></strong></span>
+          <span>あなたの換算内申(65点満点):<strong id="cardYourNaishin65"></strong></span>
+        </div>
+
+        <div style="overflow-x:auto;">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Vもぎ総合得点ライン</th>
+              <th>必要な当日点(500点満点)</th>
+              <th>5教科平均</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="line-60">
+              <td class="row-label">60%ライン</td>
+              <td class="figure" id="line60Total">-</td>
+              <td class="figure" id="line60Required">-</td>
+              <td class="figure" id="line60Average">-</td>
+            </tr>
+            <tr class="line-80">
+              <td class="row-label">80%ライン</td>
+              <td class="figure" id="line80Total">-</td>
+              <td class="figure" id="line80Required">-</td>
+              <td class="figure" id="line80Average">-</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="eighty-note">※80%ラインは、資料に記載された60%ラインの総合得点に <strong id="eightyMarginShow">20</strong> 点を加えて、このアプリが独自に算出した目安です(資料に直接記載された数値ではありません)。</p>
+      </div>
+    </section>
+
     <footer class="sheet-footer">
       <p>※ このシミュレーターは学習の目安を計算する簡易ツールです。実際の選抜方法・比率・配点は志望校の募集要項で必ずご確認ください。</p>
+      <p>※ STEP5の合格めやすは「進研Vもぎ 令和8年度受験用【暫定版6月時点】都立高校 総合得点 合格めやす表」(進学研究会、2025年9月時点)をもとにしています。学力検査と調査書の比率が7:3で、内申が9教科65点満点で算出される学校・学科のみ収録しています(体育科・芸術科など内申の算出方法が異なる一部の学科は今回は未収録です)。</p>
     </footer>
   </div>
 
@@ -590,6 +761,206 @@
 const MAIN_SUBJECTS = ["国語", "社会", "数学", "理科", "英語"];
 const SKILL_SUBJECTS = ["音楽", "美術", "保健体育", "技術・家庭"];
 const EXAM_SUBJECTS = ["国語", "数学", "英語", "社会", "理科"];
+
+const SCHOOL_DATA = [
+  { school: "日比谷", dept: "普通科", score60: 920, naishin65: 61, hensachi: 69, category: "普通科(旧1学区)", note: "自校作成問題(共通問題換算値)" },
+  { school: "小山台", dept: "普通科", score60: 845, naishin65: 56, hensachi: 62, category: "普通科(旧1学区)", note: "" },
+  { school: "三田", dept: "普通科", score60: 840, naishin65: 57, hensachi: 61, category: "普通科(旧1学区)", note: "" },
+  { school: "雪谷", dept: "普通科", score60: 700, naishin65: 45, hensachi: 52, category: "普通科(旧1学区)", note: "" },
+  { school: "田園調布", dept: "普通科", score60: 675, naishin65: 44, hensachi: 50, category: "普通科(旧1学区)", note: "" },
+  { school: "大崎", dept: "普通科", score60: 550, naishin65: 39, hensachi: 41, category: "普通科(旧1学区)", note: "" },
+  { school: "美原", dept: "普通科", score60: 480, naishin65: 36, hensachi: 36, category: "普通科(旧1学区)", note: "" },
+  { school: "八潮", dept: "普通科", score60: 410, naishin65: 32, hensachi: 32, category: "普通科(旧1学区)", note: "" },
+  { school: "大森", dept: "普通科", score60: 375, naishin65: 29, hensachi: 30, category: "普通科(旧1学区)", note: "" },
+  { school: "戸山", dept: "普通科", score60: 890, naishin65: 59, hensachi: 66, category: "普通科(旧2学区)", note: "自校作成問題(共通問題換算値)" },
+  { school: "青山", dept: "普通科", score60: 880, naishin65: 59, hensachi: 65, category: "普通科(旧2学区)", note: "自校作成問題(共通問題換算値)" },
+  { school: "新宿", dept: "普通科", score60: 865, naishin65: 59, hensachi: 63, category: "普通科(旧2学区)", note: "自校作成問題(共通問題換算値)" },
+  { school: "駒場", dept: "普通科", score60: 835, naishin65: 56, hensachi: 61, category: "普通科(旧2学区)", note: "" },
+  { school: "目黒", dept: "普通科", score60: 755, naishin65: 50, hensachi: 55, category: "普通科(旧2学区)", note: "" },
+  { school: "広尾", dept: "普通科", score60: 715, naishin65: 48, hensachi: 52, category: "普通科(旧2学区)", note: "" },
+  { school: "芦花", dept: "普通科", score60: 675, naishin65: 44, hensachi: 50, category: "普通科(旧2学区)", note: "" },
+  { school: "松原", dept: "普通科", score60: 560, naishin65: 39, hensachi: 42, category: "普通科(旧2学区)", note: "" },
+  { school: "桜町", dept: "普通科", score60: 515, naishin65: 36, hensachi: 39, category: "普通科(旧2学区)", note: "" },
+  { school: "千歳丘", dept: "普通科", score60: 445, naishin65: 34, hensachi: 34, category: "普通科(旧2学区)", note: "" },
+  { school: "深沢", dept: "普通科", score60: 390, naishin65: 30, hensachi: 31, category: "普通科(旧2学区)", note: "R8年度より新しいタイプの学校に改編予定(7:3での選抜のめやす)" },
+  { school: "井草", dept: "普通科", score60: 745, naishin65: 48, hensachi: 55, category: "普通科(旧3学区)", note: "" },
+  { school: "石神井", dept: "普通科", score60: 730, naishin65: 47, hensachi: 54, category: "普通科(旧3学区)", note: "" },
+  { school: "武蔵丘", dept: "普通科", score60: 660, naishin65: 44, hensachi: 49, category: "普通科(旧3学区)", note: "" },
+  { school: "鷺宮", dept: "普通科", score60: 630, naishin65: 42, hensachi: 47, category: "普通科(旧3学区)", note: "" },
+  { school: "杉並", dept: "普通科", score60: 610, naishin65: 40, hensachi: 46, category: "普通科(旧3学区)", note: "" },
+  { school: "大泉桜", dept: "普通科", score60: 485, naishin65: 35, hensachi: 37, category: "普通科(旧3学区)", note: "" },
+  { school: "練馬", dept: "普通科", score60: 465, naishin65: 33, hensachi: 36, category: "普通科(旧3学区)", note: "" },
+  { school: "光丘", dept: "普通科", score60: 420, naishin65: 31, hensachi: 33, category: "普通科(旧3学区)", note: "" },
+  { school: "田柄", dept: "普通科", score60: 380, naishin65: 30, hensachi: 30, category: "普通科(旧3学区)", note: "" },
+  { school: "竹早", dept: "普通科", score60: 850, naishin65: 57, hensachi: 62, category: "普通科(旧4学区)", note: "" },
+  { school: "北園", dept: "普通科", score60: 815, naishin65: 55, hensachi: 59, category: "普通科(旧4学区)", note: "" },
+  { school: "文京", dept: "普通科", score60: 770, naishin65: 51, hensachi: 56, category: "普通科(旧4学区)", note: "" },
+  { school: "豊島", dept: "普通科", score60: 735, naishin65: 48, hensachi: 54, category: "普通科(旧4学区)", note: "" },
+  { school: "向丘", dept: "普通科", score60: 665, naishin65: 45, hensachi: 49, category: "普通科(旧4学区)", note: "" },
+  { school: "高島", dept: "普通科", score60: 575, naishin65: 40, hensachi: 43, category: "普通科(旧4学区)", note: "" },
+  { school: "板橋", dept: "普通科", score60: 550, naishin65: 39, hensachi: 41, category: "普通科(旧4学区)", note: "" },
+  { school: "飛鳥", dept: "普通科", score60: 540, naishin65: 39, hensachi: 40, category: "普通科(旧4学区)", note: "" },
+  { school: "板橋有徳", dept: "普通科", score60: 455, naishin65: 34, hensachi: 35, category: "普通科(旧4学区)", note: "" },
+  { school: "大山", dept: "普通科", score60: 390, naishin65: 30, hensachi: 31, category: "普通科(旧4学区)", note: "" },
+  { school: "上野", dept: "普通科", score60: 780, naishin65: 51, hensachi: 57, category: "普通科(旧5学区)", note: "" },
+  { school: "江北", dept: "普通科", score60: 675, naishin65: 45, hensachi: 50, category: "普通科(旧5学区)", note: "" },
+  { school: "足立", dept: "普通科", score60: 585, naishin65: 42, hensachi: 43, category: "普通科(旧5学区)", note: "" },
+  { school: "竹台", dept: "普通科", score60: 530, naishin65: 37, hensachi: 40, category: "普通科(旧5学区)", note: "" },
+  { school: "忍岡", dept: "普通科", score60: 505, naishin65: 37, hensachi: 38, category: "普通科(旧5学区)", note: "" },
+  { school: "足立西", dept: "普通科", score60: 505, naishin65: 37, hensachi: 38, category: "普通科(旧5学区)", note: "" },
+  { school: "足立新田", dept: "普通科", score60: 440, naishin65: 33, hensachi: 34, category: "普通科(旧5学区)", note: "" },
+  { school: "淵江", dept: "普通科", score60: 440, naishin65: 33, hensachi: 34, category: "普通科(旧5学区)", note: "" },
+  { school: "青井", dept: "普通科", score60: 380, naishin65: 30, hensachi: 30, category: "普通科(旧5学区)", note: "" },
+  { school: "小松川", dept: "普通科", score60: 820, naishin65: 54, hensachi: 60, category: "普通科(旧6学区)", note: "" },
+  { school: "城東", dept: "普通科", score60: 805, naishin65: 53, hensachi: 59, category: "普通科(旧6学区)", note: "" },
+  { school: "江戸川", dept: "普通科", score60: 720, naishin65: 47, hensachi: 53, category: "普通科(旧6学区)", note: "" },
+  { school: "墨田川", dept: "普通科", score60: 715, naishin65: 46, hensachi: 53, category: "普通科(旧6学区)", note: "自校作成問題(共通問題換算値)" },
+  { school: "深川", dept: "普通科", score60: 705, naishin65: 46, hensachi: 52, category: "普通科(旧6学区)", note: "" },
+  { school: "深川(外)", dept: "普通科", score60: 700, naishin65: 45, hensachi: 52, category: "普通科(旧6学区)", note: "" },
+  { school: "東", dept: "普通科", score60: 655, naishin65: 43, hensachi: 49, category: "普通科(旧6学区)", note: "" },
+  { school: "本所", dept: "普通科", score60: 635, naishin65: 43, hensachi: 47, category: "普通科(旧6学区)", note: "" },
+  { school: "小岩", dept: "普通科", score60: 625, naishin65: 43, hensachi: 46, category: "普通科(旧6学区)", note: "" },
+  { school: "紅葉川", dept: "普通科", score60: 560, naishin65: 39, hensachi: 42, category: "普通科(旧6学区)", note: "" },
+  { school: "日本橋", dept: "普通科", score60: 520, naishin65: 38, hensachi: 39, category: "普通科(旧6学区)", note: "" },
+  { school: "葛飾野", dept: "普通科", score60: 505, naishin65: 37, hensachi: 38, category: "普通科(旧6学区)", note: "" },
+  { school: "篠崎", dept: "普通科", score60: 500, naishin65: 36, hensachi: 38, category: "普通科(旧6学区)", note: "" },
+  { school: "南葛飾", dept: "普通科", score60: 460, naishin65: 35, hensachi: 35, category: "普通科(旧6学区)", note: "" },
+  { school: "葛西南", dept: "普通科", score60: 390, naishin65: 30, hensachi: 31, category: "普通科(旧6学区)", note: "" },
+  { school: "八王子東", dept: "普通科", score60: 855, naishin65: 56, hensachi: 63, category: "普通科(旧7学区)", note: "自校作成問題(共通問題換算値)" },
+  { school: "町田", dept: "普通科", score60: 800, naishin65: 52, hensachi: 59, category: "普通科(旧7学区)", note: "" },
+  { school: "日野台", dept: "普通科", score60: 795, naishin65: 52, hensachi: 58, category: "普通科(旧7学区)", note: "" },
+  { school: "南平", dept: "普通科", score60: 745, naishin65: 48, hensachi: 55, category: "普通科(旧7学区)", note: "" },
+  { school: "成瀬", dept: "普通科", score60: 675, naishin65: 44, hensachi: 50, category: "普通科(旧7学区)", note: "" },
+  { school: "松が谷", dept: "普通科", score60: 630, naishin65: 42, hensachi: 47, category: "普通科(旧7学区)", note: "" },
+  { school: "翔陽", dept: "普通科", score60: 625, naishin65: 41, hensachi: 47, category: "普通科(旧7学区)", note: "" },
+  { school: "富士森", dept: "普通科", score60: 620, naishin65: 42, hensachi: 46, category: "普通科(旧7学区)", note: "" },
+  { school: "日野", dept: "普通科", score60: 620, naishin65: 42, hensachi: 46, category: "普通科(旧7学区)", note: "" },
+  { school: "松が谷(外)", dept: "普通科", score60: 600, naishin65: 40, hensachi: 45, category: "普通科(旧7学区)", note: "" },
+  { school: "小川", dept: "普通科", score60: 570, naishin65: 39, hensachi: 43, category: "普通科(旧7学区)", note: "" },
+  { school: "片倉", dept: "普通科", score60: 550, naishin65: 39, hensachi: 41, category: "普通科(旧7学区)", note: "" },
+  { school: "八王子北", dept: "普通科", score60: 495, naishin65: 37, hensachi: 37, category: "普通科(旧7学区)", note: "" },
+  { school: "山崎", dept: "普通科", score60: 440, naishin65: 33, hensachi: 34, category: "普通科(旧7学区)", note: "" },
+  { school: "野津田", dept: "普通科", score60: 380, naishin65: 30, hensachi: 30, category: "普通科(旧7学区)", note: "" },
+  { school: "立川(理数)", dept: "普通科", score60: 895, naishin65: 59, hensachi: 67, category: "普通科(旧8学区)", note: "自校作成問題(共通問題換算値)" },
+  { school: "立川", dept: "普通科", score60: 870, naishin65: 58, hensachi: 64, category: "普通科(旧8学区)", note: "自校作成問題(共通問題換算値)" },
+  { school: "昭和", dept: "普通科", score60: 795, naishin65: 53, hensachi: 58, category: "普通科(旧8学区)", note: "" },
+  { school: "東大和南", dept: "普通科", score60: 720, naishin65: 47, hensachi: 53, category: "普通科(旧8学区)", note: "" },
+  { school: "上水", dept: "普通科", score60: 675, naishin65: 44, hensachi: 50, category: "普通科(旧8学区)", note: "" },
+  { school: "東大和", dept: "普通科", score60: 590, naishin65: 41, hensachi: 44, category: "普通科(旧8学区)", note: "" },
+  { school: "福生", dept: "普通科", score60: 540, naishin65: 39, hensachi: 40, category: "普通科(旧8学区)", note: "" },
+  { school: "武蔵村山", dept: "普通科", score60: 480, naishin65: 36, hensachi: 36, category: "普通科(旧8学区)", note: "" },
+  { school: "拝島", dept: "普通科", score60: 425, naishin65: 33, hensachi: 33, category: "普通科(旧8学区)", note: "" },
+  { school: "羽村", dept: "普通科", score60: 390, naishin65: 30, hensachi: 31, category: "普通科(旧8学区)", note: "" },
+  { school: "多摩", dept: "普通科", score60: 390, naishin65: 30, hensachi: 31, category: "普通科(旧8学区)", note: "" },
+  { school: "五日市", dept: "普通科", score60: 375, naishin65: 29, hensachi: 30, category: "普通科(旧8学区)", note: "" },
+  { school: "国分寺", dept: "普通科", score60: 830, naishin65: 55, hensachi: 61, category: "普通科(旧9学区)", note: "自校作成問題(共通問題換算値)" },
+  { school: "武蔵野北", dept: "普通科", score60: 820, naishin65: 54, hensachi: 60, category: "普通科(旧9学区)", note: "" },
+  { school: "小金井北", dept: "普通科", score60: 805, naishin65: 53, hensachi: 59, category: "普通科(旧9学区)", note: "" },
+  { school: "小平", dept: "普通科", score60: 745, naishin65: 48, hensachi: 55, category: "普通科(旧9学区)", note: "" },
+  { school: "小平(外)", dept: "普通科", score60: 740, naishin65: 47, hensachi: 55, category: "普通科(旧9学区)", note: "" },
+  { school: "小平南", dept: "普通科", score60: 700, naishin65: 45, hensachi: 52, category: "普通科(旧9学区)", note: "" },
+  { school: "清瀬", dept: "普通科", score60: 690, naishin65: 45, hensachi: 51, category: "普通科(旧9学区)", note: "" },
+  { school: "保谷", dept: "普通科", score60: 625, naishin65: 41, hensachi: 47, category: "普通科(旧9学区)", note: "" },
+  { school: "田無", dept: "普通科", score60: 560, naishin65: 39, hensachi: 42, category: "普通科(旧9学区)", note: "" },
+  { school: "小平西", dept: "普通科", score60: 505, naishin65: 37, hensachi: 38, category: "普通科(旧9学区)", note: "" },
+  { school: "久留米西", dept: "普通科", score60: 490, naishin65: 36, hensachi: 37, category: "普通科(旧9学区)", note: "" },
+  { school: "東村山西", dept: "普通科", score60: 425, naishin65: 33, hensachi: 33, category: "普通科(旧9学区)", note: "" },
+  { school: "国立", dept: "普通科", score60: 900, naishin65: 60, hensachi: 67, category: "普通科(旧10学区)", note: "自校作成問題(共通問題換算値)" },
+  { school: "調布北", dept: "普通科", score60: 785, naishin65: 50, hensachi: 58, category: "普通科(旧10学区)", note: "" },
+  { school: "狛江", dept: "普通科", score60: 750, naishin65: 49, hensachi: 55, category: "普通科(旧10学区)", note: "" },
+  { school: "神代", dept: "普通科", score60: 730, naishin65: 47, hensachi: 54, category: "普通科(旧10学区)", note: "" },
+  { school: "調布南", dept: "普通科", score60: 715, naishin65: 46, hensachi: 53, category: "普通科(旧10学区)", note: "" },
+  { school: "府中", dept: "普通科", score60: 670, naishin65: 43, hensachi: 50, category: "普通科(旧10学区)", note: "" },
+  { school: "府中西", dept: "普通科", score60: 560, naishin65: 39, hensachi: 42, category: "普通科(旧10学区)", note: "" },
+  { school: "府中東", dept: "普通科", score60: 550, naishin65: 39, hensachi: 41, category: "普通科(旧10学区)", note: "" },
+  { school: "永山", dept: "普通科", score60: 455, naishin65: 33, hensachi: 35, category: "普通科(旧10学区)", note: "" },
+  { school: "千早", dept: "ビジネスコミュニケーション科", score60: 520, naishin65: 38, hensachi: 39, category: "専門学科", note: "" },
+  { school: "第五商業", dept: "ビジネス科", score60: 515, naishin65: 37, hensachi: 39, category: "専門学科", note: "" },
+  { school: "芝商業", dept: "ビジネス科", score60: 470, naishin65: 34, hensachi: 36, category: "専門学科", note: "" },
+  { school: "第一商業", dept: "ビジネス科", score60: 420, naishin65: 32, hensachi: 33, category: "専門学科", note: "" },
+  { school: "第三商業", dept: "ビジネス科", score60: 420, naishin65: 31, hensachi: 33, category: "専門学科", note: "" },
+  { school: "江東商業", dept: "ビジネス科", score60: 420, naishin65: 31, hensachi: 33, category: "専門学科", note: "" },
+  { school: "第四商業", dept: "ビジネス科", score60: 400, naishin65: 30, hensachi: 32, category: "専門学科", note: "" },
+  { school: "大田桜台", dept: "ビジネスコミュニケーション科", score60: 390, naishin65: 30, hensachi: 31, category: "専門学科", note: "" },
+  { school: "葛飾商業", dept: "ビジネス科", score60: 390, naishin65: 30, hensachi: 31, category: "専門学科", note: "" },
+  { school: "蔵前工科", dept: "建築科", score60: 510, naishin65: 35, hensachi: 39, category: "専門学科", note: "" },
+  { school: "蔵前工科", dept: "電気科", score60: 490, naishin65: 34, hensachi: 38, category: "専門学科", note: "" },
+  { school: "蔵前工科", dept: "設備工業科", score60: 475, naishin65: 33, hensachi: 37, category: "専門学科", note: "" },
+  { school: "府中工科", dept: "情報技術科", score60: 470, naishin65: 32, hensachi: 37, category: "専門学科", note: "" },
+  { school: "杉並工科", dept: "IT環境科", score60: 465, naishin65: 31, hensachi: 37, category: "専門学科", note: "" },
+  { school: "蔵前工科", dept: "機械科", score60: 460, naishin65: 32, hensachi: 36, category: "専門学科", note: "" },
+  { school: "府中工科", dept: "工業技術科", score60: 450, naishin65: 32, hensachi: 35, category: "専門学科", note: "" },
+  { school: "墨田工科", dept: "建築・自動車科", score60: 420, naishin65: 31, hensachi: 33, category: "専門学科", note: "" },
+  { school: "多摩工科", dept: "電気科", score60: 420, naishin65: 31, hensachi: 33, category: "専門学科", note: "" },
+  { school: "総合工科", dept: "機械・自動車/電気・情報デザイン/建築・都市工学科", score60: 420, naishin65: 31, hensachi: 33, category: "専門学科", note: "" },
+  { school: "田無工科", dept: "建築・都市工学科", score60: 405, naishin65: 31, hensachi: 32, category: "専門学科", note: "" },
+  { school: "墨田工科", dept: "機械・電気科", score60: 395, naishin65: 29, hensachi: 32, category: "専門学科", note: "" },
+  { school: "葛西工科", dept: "電子・建築科", score60: 395, naishin65: 29, hensachi: 32, category: "専門学科", note: "" },
+  { school: "府中工科", dept: "機械・電気科", score60: 395, naishin65: 29, hensachi: 32, category: "専門学科", note: "" },
+  { school: "六郷工科", dept: "ものづくり工学科", score60: 390, naishin65: 28, hensachi: 32, category: "専門学科", note: "" },
+  { school: "多摩工科", dept: "機械・環境化学科", score60: 390, naishin65: 30, hensachi: 31, category: "専門学科", note: "" },
+  { school: "田無工科", dept: "機械科", score60: 390, naishin65: 30, hensachi: 31, category: "専門学科", note: "" },
+  { school: "町田工科", dept: "総合情報科", score60: 385, naishin65: 29, hensachi: 31, category: "専門学科", note: "" },
+  { school: "葛西工科", dept: "機械科", score60: 380, naishin65: 28, hensachi: 31, category: "専門学科", note: "" },
+  { school: "荒川工科", dept: "情報技術科", score60: 375, naishin65: 27, hensachi: 31, category: "専門学科", note: "" },
+  { school: "北豊島工科", dept: "都市防災技術科", score60: 375, naishin65: 27, hensachi: 31, category: "専門学科", note: "" },
+  { school: "多摩工科", dept: "デュアルシステム科", score60: 370, naishin65: 28, hensachi: 30, category: "専門学科", note: "" },
+  { school: "足立工科", dept: "総合技術科", score60: 360, naishin65: 26, hensachi: 30, category: "専門学科", note: "" },
+  { school: "葛西工科", dept: "デュアルシステム科", score60: 360, naishin65: 26, hensachi: 30, category: "専門学科", note: "" },
+  { school: "荒川工科", dept: "電気・電子科", score60: 360, naishin65: 26, hensachi: 30, category: "専門学科", note: "" },
+  { school: "園芸", dept: "動物科", score60: 600, naishin65: 40, hensachi: 45, category: "専門学科", note: "" },
+  { school: "農業", dept: "食物科", score60: 570, naishin65: 39, hensachi: 43, category: "専門学科", note: "" },
+  { school: "瑞穂農芸", dept: "畜産科学科", score60: 545, naishin65: 38, hensachi: 41, category: "専門学科", note: "" },
+  { school: "赤羽北桜", dept: "調理科", score60: 520, naishin65: 38, hensachi: 39, category: "専門学科", note: "" },
+  { school: "農業", dept: "服飾科", score60: 520, naishin65: 38, hensachi: 39, category: "専門学科", note: "" },
+  { school: "園芸", dept: "食品科", score60: 510, naishin65: 35, hensachi: 39, category: "専門学科", note: "" },
+  { school: "農業", dept: "都市園芸・食品科学科", score60: 500, naishin65: 36, hensachi: 38, category: "専門学科", note: "" },
+  { school: "農芸", dept: "食品科学科", score60: 485, naishin65: 35, hensachi: 37, category: "専門学科", note: "" },
+  { school: "忍岡", dept: "生活科学科", score60: 480, naishin65: 36, hensachi: 36, category: "専門学科", note: "" },
+  { school: "園芸", dept: "園芸科", score60: 480, naishin65: 34, hensachi: 37, category: "専門学科", note: "" },
+  { school: "農芸", dept: "園芸科学科", score60: 470, naishin65: 34, hensachi: 36, category: "専門学科", note: "" },
+  { school: "農業", dept: "緑地計画科", score60: 465, naishin65: 33, hensachi: 36, category: "専門学科", note: "" },
+  { school: "農芸", dept: "緑地環境科", score60: 455, naishin65: 33, hensachi: 35, category: "専門学科", note: "" },
+  { school: "赤羽北桜", dept: "介護福祉科", score60: 445, naishin65: 34, hensachi: 34, category: "専門学科", note: "" },
+  { school: "瑞穂農芸", dept: "生活デザイン科", score60: 445, naishin65: 34, hensachi: 34, category: "専門学科", note: "" },
+  { school: "瑞穂農芸", dept: "食品・園芸科学科", score60: 440, naishin65: 33, hensachi: 34, category: "専門学科", note: "" },
+  { school: "農産", dept: "食品科", score60: 435, naishin65: 32, hensachi: 34, category: "専門学科", note: "" },
+  { school: "農産", dept: "園芸デザイン科", score60: 430, naishin65: 31, hensachi: 34, category: "専門学科", note: "" },
+  { school: "野津田", dept: "福祉科", score60: 425, naishin65: 33, hensachi: 33, category: "専門学科", note: "" },
+  { school: "赤羽北桜", dept: "保育・栄養科", score60: 410, naishin65: 32, hensachi: 32, category: "専門学科", note: "" },
+  { school: "晴海総合", dept: "総合学科", score60: 635, naishin65: 43, hensachi: 47, category: "総合学科・その他", note: "" },
+  { school: "青梅総合", dept: "総合学科", score60: 595, naishin65: 42, hensachi: 44, category: "総合学科・その他", note: "" },
+  { school: "杉並総合", dept: "総合学科", score60: 575, naishin65: 40, hensachi: 43, category: "総合学科・その他", note: "" },
+  { school: "王子総合", dept: "総合学科", score60: 550, naishin65: 39, hensachi: 41, category: "総合学科・その他", note: "" },
+  { school: "つばさ総合", dept: "総合学科", score60: 545, naishin65: 38, hensachi: 41, category: "総合学科・その他", note: "" },
+  { school: "東久留米総合", dept: "総合学科", score60: 515, naishin65: 37, hensachi: 39, category: "総合学科・その他", note: "" },
+  { school: "若葉総合", dept: "総合学科", score60: 495, naishin65: 37, hensachi: 37, category: "総合学科・その他", note: "" },
+  { school: "世田谷総合", dept: "総合学科", score60: 490, naishin65: 36, hensachi: 37, category: "総合学科・その他", note: "" },
+  { school: "葛飾総合", dept: "総合学科", score60: 480, naishin65: 36, hensachi: 36, category: "総合学科・その他", note: "" },
+  { school: "町田総合", dept: "総合学科", score60: 460, naishin65: 35, hensachi: 35, category: "総合学科・その他", note: "" },
+  { school: "国際", dept: "国際科", score60: 835, naishin65: 56, hensachi: 61, category: "総合学科・その他", note: "" },
+  { school: "工芸", dept: "デザイン科", score60: 750, naishin65: 51, hensachi: 54, category: "総合学科・その他", note: "" },
+  { school: "多摩科学技術", dept: "科学技術科", score60: 745, naishin65: 44, hensachi: 57, category: "総合学科・その他", note: "" },
+  { school: "工芸", dept: "グラフィック科", score60: 710, naishin65: 47, hensachi: 52, category: "総合学科・その他", note: "" },
+  { school: "科学技術", dept: "創造理数科", score60: 675, naishin65: 42, hensachi: 51, category: "総合学科・その他", note: "" },
+  { school: "工芸", dept: "インテリア・アートクラフト科", score60: 675, naishin65: 45, hensachi: 50, category: "総合学科・その他", note: "" },
+  { school: "工芸", dept: "マシンクラフト科", score60: 660, naishin65: 44, hensachi: 49, category: "総合学科・その他", note: "" },
+  { school: "八王子桑志", dept: "システム情報科", score60: 615, naishin65: 39, hensachi: 47, category: "総合学科・その他", note: "" },
+  { school: "科学技術", dept: "科学技術科", score60: 600, naishin65: 38, hensachi: 46, category: "総合学科・その他", note: "" },
+  { school: "八王子桑志", dept: "デザイン科", score60: 585, naishin65: 40, hensachi: 44, category: "総合学科・その他", note: "" },
+  { school: "八王子桑志", dept: "クラフト科", score60: 520, naishin65: 35, hensachi: 40, category: "総合学科・その他", note: "" },
+  { school: "八王子桑志", dept: "ビジネス情報科", score60: 515, naishin65: 36, hensachi: 39, category: "総合学科・その他", note: "" },
+  { school: "片倉", dept: "造形美術科", score60: 510, naishin65: 38, hensachi: 38, category: "総合学科・その他", note: "" },
+  { school: "大島海洋国際", dept: "海洋国際科", score60: 460, naishin65: 32, hensachi: 36, category: "総合学科・その他", note: "" },
+  { school: "橘", dept: "産業科", score60: 395, naishin65: 29, hensachi: 32, category: "総合学科・その他", note: "" },
+  { school: "砂川", dept: "定時制普通科(昼夜間)", score60: 440, naishin65: 33, hensachi: 34, category: "総合学科・その他", note: "" },
+];
+// 80%ラインの推定に使う共通設定。
+// Vもぎの資料には「60%ラインの総合得点+20点」という関係は明記されていないため、
+// このアプリ独自の暫定ルールとして、ここで一括管理する。
+// 値を変えたい場合はこの1か所を書き換えるだけでよい。
+const EIGHTY_PERCENT_MARGIN = 20;
+
 
 function buildGradeSelect(id) {
   let opts = "";
@@ -635,11 +1006,16 @@ function getRatio() {
   return { a, b };
 }
 
+let currentKanzanNaishin = 0;
+let currentKanzanNaishin300 = 0;
+
 function calcAndRender() {
   const mainSum = getMainSum();
   const skillSum = getSkillSum();
   const kanzanNaishin = mainSum + skillSum * 2; // 65点満点
   const kanzanNaishin300 = (kanzanNaishin / 65) * 300;
+  currentKanzanNaishin = kanzanNaishin;
+  currentKanzanNaishin300 = kanzanNaishin300;
 
   document.getElementById("kanzanNaishin").innerHTML = `${kanzanNaishin}<span class="result-unit"> / 65点</span>`;
   document.getElementById("kanzanNaishin300").innerHTML = `${kanzanNaishin300.toFixed(1)}<span class="result-unit">点</span>`;
@@ -700,6 +1076,76 @@ function calcAndRender() {
     diffEl.textContent = `あと${Math.abs(diff).toFixed(1)}点足りません`;
     diffEl.className = "diff-line diff-ng";
   }
+
+  renderSchoolResult();
+}
+
+function schoolKey(row) {
+  return `${row.school}(${row.dept})`;
+}
+
+function initSchoolList() {
+  const listEl = document.getElementById("schoolList");
+  SCHOOL_DATA.forEach(row => {
+    const opt = document.createElement("option");
+    opt.value = schoolKey(row);
+    listEl.appendChild(opt);
+  });
+}
+
+// STEP5の収録校はすべて「学力検査:調査書=7:3」の学校のため、比率は7:3で固定して計算する。
+// (7:3以外の比率や、内申の算出方法が異なる学科は今回のデータに含めていない)
+function requiredRawScoreFor(targetTotal, chousho300) {
+  const a = 7, b = 3;
+  const choushoKanzan = chousho300 * (b / 3);
+  const requiredExamKanzan = targetTotal - choushoKanzan;
+  return requiredExamKanzan / (a / 5);
+}
+
+function renderSchoolLine(prefix, targetTotal) {
+  const raw = requiredRawScoreFor(targetTotal, currentKanzanNaishin300);
+  document.getElementById(`${prefix}Total`).innerHTML = `${targetTotal}<span class="unit">点</span>`;
+  const reqEl = document.getElementById(`${prefix}Required`);
+  const avgEl = document.getElementById(`${prefix}Average`);
+
+  if (raw <= 0) {
+    reqEl.innerHTML = `0<span class="unit">点でOK</span>`;
+    avgEl.innerHTML = `-`;
+  } else if (raw > 500) {
+    reqEl.textContent = "届きません";
+    avgEl.textContent = "-";
+  } else {
+    const rounded = Math.ceil(raw);
+    reqEl.innerHTML = `${rounded}<span class="unit">点</span>`;
+    avgEl.innerHTML = `${(rounded / 5).toFixed(1)}<span class="unit">点</span>`;
+  }
+}
+
+function renderSchoolResult() {
+  const card = document.getElementById("schoolCard");
+  const empty = document.getElementById("schoolEmpty");
+  const input = document.getElementById("schoolSearch");
+  if (!input) return;
+
+  const row = SCHOOL_DATA.find(r => schoolKey(r) === input.value.trim());
+
+  if (!row) {
+    card.classList.remove("is-visible");
+    empty.style.display = "";
+    return;
+  }
+  empty.style.display = "none";
+  card.classList.add("is-visible");
+
+  document.getElementById("cardSchoolName").textContent = row.school;
+  document.getElementById("cardSchoolDept").textContent = row.dept;
+  document.getElementById("cardSchoolNote").textContent = row.note ? `※${row.note}` : "";
+  document.getElementById("cardNaishin65").textContent = `${row.naishin65} / 65点`;
+  document.getElementById("cardYourNaishin65").textContent = `${currentKanzanNaishin} / 65点`;
+  document.getElementById("eightyMarginShow").textContent = EIGHTY_PERCENT_MARGIN;
+
+  renderSchoolLine("line60", row.score60);
+  renderSchoolLine("line80", row.score60 + EIGHTY_PERCENT_MARGIN);
 }
 
 function attachListeners() {
@@ -716,6 +1162,7 @@ function setDefaultDate() {
 
 initGradeInputs();
 initExamSubjectInputs();
+initSchoolList();
 attachListeners();
 setDefaultDate();
 calcAndRender();

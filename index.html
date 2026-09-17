@@ -725,31 +725,9 @@
     <section class="step" id="step2">
       <div class="step-heading">
         <span class="step-no">STEP 2</span>
-        <h2>学力検査と調査書の比率を選びます</h2>
+        <h2>志望校を選びましょう</h2>
       </div>
-      <p class="lead">都立高校は学校ごとに比率が決まっています。分からない場合は、多くの高校で使われている「7:3」のままで大丈夫です(志望校の募集要項で確認できます)。</p>
-      <div class="chip-group" id="ratioGroup">
-        <label class="chip">
-          <input type="radio" name="ratio" value="7:3" checked>
-          <span class="chip-face"><span class="chip-check">✓&nbsp;</span>7 : 3<small>標準</small></span>
-        </label>
-        <label class="chip">
-          <input type="radio" name="ratio" value="6:4">
-          <span class="chip-face"><span class="chip-check">✓&nbsp;</span>6 : 4</span>
-        </label>
-        <label class="chip">
-          <input type="radio" name="ratio" value="3:7">
-          <span class="chip-face"><span class="chip-check">✓&nbsp;</span>3 : 7<small>実技系など</small></span>
-        </label>
-      </div>
-    </section>
-
-    <section class="step" id="step3">
-      <div class="step-heading">
-        <span class="step-no">STEP 3</span>
-        <h2>志望校を選ぶか、目標点を入力しましょう</h2>
-      </div>
-      <p class="lead">志望校を選ぶと、「進研Vもぎ 令和9年度受験用【暫定版6月時点】都立高校 総合得点 合格めやす表」(2026年6月時点データ、進学研究会)の総合得点が自動で入り、当日の学力検査で必要な得点がすぐに分かります。志望校がまだ決まっていない場合は、下の欄に目標総合得点を直接入力しても構いません。※このデータはまだ解析中の暫定値のため、今後基準が変わる場合があります。最新の基準値は8・9月以降のVもぎで確認してください。</p>
+      <p class="lead">志望校を選ぶと、「進研Vもぎ 令和9年度受験用【暫定版6月時点】都立高校 総合得点 合格めやす表」(2026年6月時点データ、進学研究会)の総合得点が自動で入り、当日の学力検査で必要な得点がすぐに分かります。総合得点を自分で入力する必要はありません。志望校がまだ決まっていない場合だけ、下の欄に目標総合得点を直接入力してください。※このデータはまだ解析中の暫定値のため、今後基準が変わる場合があります。最新の基準値は8・9月以降のVもぎで確認してください。</p>
 
       <div class="school-picker no-print">
         <input type="text" id="schoolSearch" placeholder="学校名で検索(例:戸山)" autocomplete="off" inputmode="search">
@@ -841,6 +819,28 @@
       </div>
     </section>
 
+    <section class="step" id="step3">
+      <div class="step-heading">
+        <span class="step-no">STEP 3</span>
+        <h2>学力検査と調査書の比率を選びます</h2>
+      </div>
+      <p class="lead">STEP2で志望校を選んだ場合は、比率はすでに「7:3」で計算されているので、ここは触らなくて大丈夫です。志望校を選ばずに目標点を直接入力した場合や、比率が7:3以外の学校を確認したい場合に使ってください。</p>
+      <div class="chip-group" id="ratioGroup">
+        <label class="chip">
+          <input type="radio" name="ratio" value="7:3" checked>
+          <span class="chip-face"><span class="chip-check">✓&nbsp;</span>7 : 3<small>標準</small></span>
+        </label>
+        <label class="chip">
+          <input type="radio" name="ratio" value="6:4">
+          <span class="chip-face"><span class="chip-check">✓&nbsp;</span>6 : 4</span>
+        </label>
+        <label class="chip">
+          <input type="radio" name="ratio" value="3:7">
+          <span class="chip-face"><span class="chip-check">✓&nbsp;</span>3 : 7<small>実技系など</small></span>
+        </label>
+      </div>
+    </section>
+
     <section class="step" id="step4">
       <div class="step-heading">
         <span class="step-no">STEP 4</span>
@@ -862,7 +862,7 @@
 
     <footer class="sheet-footer">
       <p>※ このシミュレーターは学習の目安を計算する簡易ツールです。実際の選抜方法・比率・配点は志望校の募集要項で必ずご確認ください。</p>
-      <p>※ STEP3の合格めやすは「進研Vもぎ 令和9年度受験用【暫定版6月時点】都立高校 総合得点 合格めやす表」(進学研究会、2026年6月時点)をもとにしています。学力検査と調査書の比率が7:3で、内申が9教科65点満点で算出される学校・学科のみ収録しています(体育科・芸術科など内申の算出方法が異なる一部の学科は今回は未収録です)。このデータは解析中の暫定値のため、今後基準が変更される場合があります。</p>
+      <p>※ STEP2の合格めやすは「進研Vもぎ 令和9年度受験用【暫定版6月時点】都立高校 総合得点 合格めやす表」(進学研究会、2026年6月時点)をもとにしています。学力検査と調査書の比率が7:3で、内申が9教科65点満点で算出される学校・学科のみ収録しています(体育科・芸術科など内申の算出方法が異なる一部の学科は今回は未収録です)。このデータは解析中の暫定値のため、今後基準が変更される場合があります。</p>
     </footer>
   </div>
 

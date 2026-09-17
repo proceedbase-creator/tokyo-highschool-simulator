@@ -556,32 +556,20 @@
     color: var(--sub);
   }
   .school-meta-row strong { color: var(--navy); font-weight: 700; }
+  #lineChoiceGroup {
+    margin: 4px 0 18px;
+  }
+  #lineChoiceGroup .chip-face {
+    min-width: auto;
+    font-size: 0.95rem;
+    min-height: 44px;
+    padding: 8px 16px;
+  }
   .eighty-note {
     margin: 14px 0 0;
     font-size: 0.78rem;
     color: var(--sub);
   }
-  .use-target-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-  }
-  .use-target-button {
-    flex: 1 1 220px;
-    font-family: "Noto Sans JP", sans-serif;
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: var(--navy);
-    background: #fff;
-    border: 1px solid var(--navy);
-    border-radius: 3px;
-    padding: 12px 14px;
-    min-height: 48px;
-    cursor: pointer;
-  }
-  .use-target-button:hover { background: #f2f3f5; }
-  .use-target-button:active { background: var(--navy); color: #fff; }
   .target-source-note {
     margin: 10px 0 0;
     font-size: 0.82rem;
@@ -759,12 +747,79 @@
     <section class="step" id="step3">
       <div class="step-heading">
         <span class="step-no">STEP 3</span>
-        <h2>目標にする総合得点を入力します</h2>
+        <h2>志望校を選ぶか、目標点を入力しましょう</h2>
       </div>
-      <p class="lead">総合得点は1000点満点です。志望校の合格ラインの目安を入力しましょう。STEP5で志望校を選ぶと、ここに自動で入力することもできます。</p>
+      <p class="lead">志望校を選ぶと、「進研Vもぎ 令和9年度受験用【暫定版6月時点】都立高校 総合得点 合格めやす表」(2026年6月時点データ、進学研究会)の総合得点が自動で入り、当日の学力検査で必要な得点がすぐに分かります。志望校がまだ決まっていない場合は、下の欄に目標総合得点を直接入力しても構いません。※このデータはまだ解析中の暫定値のため、今後基準が変わる場合があります。最新の基準値は8・9月以降のVもぎで確認してください。</p>
+
+      <div class="school-picker no-print">
+        <input type="text" id="schoolSearch" placeholder="学校名で検索(例:戸山)" autocomplete="off" inputmode="search">
+        <div class="category-chip-group" id="categoryChips">
+          <button type="button" class="category-chip is-active" data-category="all">すべて</button>
+          <button type="button" class="category-chip" data-category="普通科">普通科</button>
+          <button type="button" class="category-chip" data-category="専門学科">専門学科</button>
+          <button type="button" class="category-chip" data-category="総合学科・その他">総合学科・その他</button>
+        </div>
+        <p class="hint">学校名を入力するか、一覧からタップして選べます。同じ学校で学科が複数ある場合は学科名も表示されます。</p>
+        <div class="school-list" id="schoolResultsList"></div>
+      </div>
+
+      <p class="school-empty" id="schoolEmpty">学校名を入力するか一覧からタップすると、その学校の合格めやすが自動で表示されます。学校を選ばず、下の欄に目標総合得点を直接入力することもできます。</p>
+
+      <div class="school-card" id="schoolCard">
+        <div class="school-card-head">
+          <span class="name" id="cardSchoolName"></span>
+          <span class="dept" id="cardSchoolDept"></span>
+        </div>
+        <p class="school-card-note" id="cardSchoolNote"></p>
+
+        <div class="school-meta-row">
+          <span>表の基準内申(65点満点):<strong id="cardNaishin65"></strong></span>
+          <span>あなたの換算内申(65点満点):<strong id="cardYourNaishin65"></strong></span>
+        </div>
+
+        <div class="chip-group no-print" id="lineChoiceGroup">
+          <label class="chip">
+            <input type="radio" name="lineChoice" value="60" checked>
+            <span class="chip-face"><span class="chip-check">✓&nbsp;</span>60%ラインを使う</span>
+          </label>
+          <label class="chip">
+            <input type="radio" name="lineChoice" value="80">
+            <span class="chip-face"><span class="chip-check">✓&nbsp;</span>80%ラインを使う</span>
+          </label>
+        </div>
+
+        <div style="overflow-x:auto;">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Vもぎ総合得点ライン</th>
+              <th>必要な当日点(500点満点)</th>
+              <th>5教科平均</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="line-60">
+              <td class="row-label">60%ライン</td>
+              <td class="figure" id="line60Total">-</td>
+              <td class="figure" id="line60Required">-</td>
+              <td class="figure" id="line60Average">-</td>
+            </tr>
+            <tr class="line-80">
+              <td class="row-label">80%ライン</td>
+              <td class="figure" id="line80Total">-</td>
+              <td class="figure" id="line80Required">-</td>
+              <td class="figure" id="line80Average">-</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="eighty-note">※80%ラインは、資料に記載された60%ラインの総合得点に <strong id="eightyMarginShow">20</strong> 点を加えて、このアプリが独自に算出した目安です(資料に直接記載された数値ではありません)。上のボタンで、どちらを目標点として使うか選べます。</p>
+      </div>
+
       <div class="inline-field">
         <input type="number" id="targetTotal" inputmode="numeric" value="700" class="fill-blank fill-blank--wide">
-        <span class="inline-suffix">点 ／ 1000点満点</span>
+        <span class="inline-suffix">点 ／ 1000点満点(目標にする総合得点)</span>
       </div>
       <p class="target-source-note" id="targetSourceNote"></p>
 
@@ -805,77 +860,9 @@
       <p class="diff-line" id="subjectDiff"></p>
     </section>
 
-    <section class="step" id="step5">
-      <div class="step-heading">
-        <span class="step-no">STEP 5</span>
-        <h2>志望校を選んで合格めやすと比べてみましょう</h2>
-      </div>
-      <p class="lead">「進研Vもぎ 令和9年度受験用【暫定版6月時点】都立高校 総合得点 合格めやす表」(2026年6月時点データ、進学研究会)をもとにした、合格可能性60%の目安です。学校名を入力すると、その学校の目安と、今の内申から必要な当日点が分かります。※このデータはまだ解析中の暫定値のため、今後基準が変わる場合があります。最新の基準値は8・9月以降のVもぎで確認してください。</p>
-
-      <div class="school-picker no-print">
-        <input type="text" id="schoolSearch" placeholder="学校名で検索(例:戸山)" autocomplete="off" inputmode="search">
-        <div class="category-chip-group" id="categoryChips">
-          <button type="button" class="category-chip is-active" data-category="all">すべて</button>
-          <button type="button" class="category-chip" data-category="普通科">普通科</button>
-          <button type="button" class="category-chip" data-category="専門学科">専門学科</button>
-          <button type="button" class="category-chip" data-category="総合学科・その他">総合学科・その他</button>
-        </div>
-        <p class="hint">学校名を入力するか、一覧からタップして選べます。同じ学校で学科が複数ある場合は学科名も表示されます。</p>
-        <div class="school-list" id="schoolResultsList"></div>
-      </div>
-
-      <p class="school-empty" id="schoolEmpty">学校名を入力するか、一覧からタップすると、ここに合格めやすが表示されます。</p>
-
-      <div class="school-card" id="schoolCard">
-        <div class="school-card-head">
-          <span class="name" id="cardSchoolName"></span>
-          <span class="dept" id="cardSchoolDept"></span>
-        </div>
-        <p class="school-card-note" id="cardSchoolNote"></p>
-
-        <div class="school-meta-row">
-          <span>表の基準内申(65点満点):<strong id="cardNaishin65"></strong></span>
-          <span>あなたの換算内申(65点満点):<strong id="cardYourNaishin65"></strong></span>
-        </div>
-
-        <div style="overflow-x:auto;">
-        <table class="compare-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Vもぎ総合得点ライン</th>
-              <th>必要な当日点(500点満点)</th>
-              <th>5教科平均</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="line-60">
-              <td class="row-label">60%ライン</td>
-              <td class="figure" id="line60Total">-</td>
-              <td class="figure" id="line60Required">-</td>
-              <td class="figure" id="line60Average">-</td>
-            </tr>
-            <tr class="line-80">
-              <td class="row-label">80%ライン</td>
-              <td class="figure" id="line80Total">-</td>
-              <td class="figure" id="line80Required">-</td>
-              <td class="figure" id="line80Average">-</td>
-            </tr>
-          </tbody>
-        </table>
-        </div>
-
-        <div class="use-target-row no-print">
-          <button type="button" class="use-target-button" id="useLine60Button">60%ラインをSTEP3の目標にする</button>
-          <button type="button" class="use-target-button" id="useLine80Button">80%ラインをSTEP3の目標にする</button>
-        </div>
-        <p class="eighty-note">※80%ラインは、資料に記載された60%ラインの総合得点に <strong id="eightyMarginShow">20</strong> 点を加えて、このアプリが独自に算出した目安です(資料に直接記載された数値ではありません)。</p>
-      </div>
-    </section>
-
     <footer class="sheet-footer">
       <p>※ このシミュレーターは学習の目安を計算する簡易ツールです。実際の選抜方法・比率・配点は志望校の募集要項で必ずご確認ください。</p>
-      <p>※ STEP5の合格めやすは「進研Vもぎ 令和9年度受験用【暫定版6月時点】都立高校 総合得点 合格めやす表」(進学研究会、2026年6月時点)をもとにしています。学力検査と調査書の比率が7:3で、内申が9教科65点満点で算出される学校・学科のみ収録しています(体育科・芸術科など内申の算出方法が異なる一部の学科は今回は未収録です)。このデータは解析中の暫定値のため、今後基準が変更される場合があります。</p>
+      <p>※ STEP3の合格めやすは「進研Vもぎ 令和9年度受験用【暫定版6月時点】都立高校 総合得点 合格めやす表」(進学研究会、2026年6月時点)をもとにしています。学力検査と調査書の比率が7:3で、内申が9教科65点満点で算出される学校・学科のみ収録しています(体育科・芸術科など内申の算出方法が異なる一部の学科は今回は未収録です)。このデータは解析中の暫定値のため、今後基準が変更される場合があります。</p>
     </footer>
   </div>
 
@@ -1253,6 +1240,7 @@ function renderSchoolList() {
       selectedSchool = SCHOOL_DATA[Number(btn.dataset.index)];
       renderSchoolList();
       renderSchoolResult();
+      applyTargetFromSchool();
     });
   });
 }
@@ -1271,8 +1259,9 @@ function initSchoolPicker() {
     });
   });
 
-  document.getElementById("useLine60Button").addEventListener("click", () => applyTargetFromSchool(60));
-  document.getElementById("useLine80Button").addEventListener("click", () => applyTargetFromSchool(80));
+  document.querySelectorAll('input[name="lineChoice"]').forEach(radio => {
+    radio.addEventListener("change", applyTargetFromSchool);
+  });
 }
 
 // STEP5の収録校はすべて「学力検査:調査書=7:3」の学校のため、比率は7:3で固定して計算する。
@@ -1331,16 +1320,21 @@ function renderSchoolResult() {
 
 let targetSourceValue = null;
 
-function applyTargetFromSchool(percent) {
+function getSelectedLinePercent() {
+  const checked = document.querySelector('input[name="lineChoice"]:checked');
+  return checked ? Number(checked.value) : 60;
+}
+
+function applyTargetFromSchool() {
   if (!selectedSchool) return;
+  const percent = getSelectedLinePercent();
   const value = percent === 80 ? selectedSchool.score60 + EIGHTY_PERCENT_MARGIN : selectedSchool.score60;
   const input = document.getElementById("targetTotal");
   input.value = value;
   targetSourceValue = value;
   document.getElementById("targetSourceNote").textContent =
-    `※ ${selectedSchool.school}(${selectedSchool.dept})の${percent}%ラインの総合得点(${value}点)を目標に設定しました。`;
+    `※ ${selectedSchool.school}(${selectedSchool.dept})の${percent}%ラインの総合得点(${value}点)です。`;
   calcAndRender();
-  document.getElementById("step3").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function initTargetSourceTracking() {

@@ -65,35 +65,6 @@
     border-bottom: 3px solid var(--ink);
     height: 3px;
   }
-  .header-meta {
-    display: flex;
-    gap: 32px;
-    flex-wrap: wrap;
-  }
-  .meta-field {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    flex: 1 1 220px;
-  }
-  .meta-field label {
-    font-size: 0.85rem;
-    color: var(--sub);
-    white-space: nowrap;
-  }
-  .meta-field input {
-    flex: 1;
-    border: none;
-    border-bottom: 1px solid var(--line-strong);
-    background: transparent;
-    font-family: inherit;
-    font-size: 1rem;
-    padding: 6px 4px;
-    color: var(--ink);
-    min-width: 0;
-  }
-  .meta-field input:focus { outline: none; border-bottom-color: var(--navy); }
-
   /* ---------- steps ---------- */
   .step {
     margin-bottom: 50px;
@@ -621,7 +592,6 @@
     .sheet-header { margin-bottom: 12px; }
     .eyebrow { margin-bottom: 3px; }
     .header-rule { margin: 10px 0 10px; }
-    .meta-field input { padding: 3px 4px; }
 
     .step { page-break-inside: avoid; margin-bottom: 7px; }
     .step-heading { margin-bottom: 4px; }
@@ -681,16 +651,6 @@
       <p class="eyebrow">東京都立高校入試 一般入試</p>
       <h1>得点シミュレーター</h1>
       <hr class="header-rule">
-      <div class="header-meta">
-        <div class="meta-field">
-          <label for="studentName">氏名</label>
-          <input type="text" id="studentName" placeholder="">
-        </div>
-        <div class="meta-field">
-          <label for="printDate">作成日</label>
-          <input type="text" id="printDate">
-        </div>
-      </div>
     </header>
 
     <section class="step" id="step1">
@@ -1353,17 +1313,11 @@ function attachListeners() {
   });
 }
 
-function setDefaultDate() {
-  const d = new Date();
-  document.getElementById("printDate").value = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-}
-
 initGradeInputs();
 initExamSubjectInputs();
 initSchoolPicker();
 initTargetSourceTracking();
 attachListeners();
-setDefaultDate();
 calcAndRender();
 
 document.getElementById("printButton").addEventListener("click", () => window.print());

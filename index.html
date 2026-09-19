@@ -143,6 +143,7 @@
     border-radius: 3px;
   }
   .grade-select:focus { outline: 2px solid var(--brick); outline-offset: 1px; }
+  .grade-print-value, .ratio-print-value { display: none; }
 
   /* ---------- result strip (step1) ---------- */
   .result-strip {
@@ -602,20 +603,30 @@
     .block-label { margin-bottom: 5px; }
     .grade-grid { gap: 5px 12px; }
     .grade-item { padding-bottom: 3px; }
-    .grade-select {
-      font-size: 1.1rem;
-      padding: 2px 20px 2px 7px;
-      min-height: 26px;
-      min-width: 50px;
-      background-position: right 7px center;
+    .grade-select { display: none; }
+    .grade-print-value {
+      display: inline-block;
+      font-family: "Shippori Mincho", serif;
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 1.2rem;
+      min-width: 28px;
+      text-align: center;
+      border-bottom: 1px solid var(--line-strong);
+      padding: 0 6px;
     }
 
     .result-strip { margin-top: 6px; padding: 5px 8px; }
     .result-number { font-size: 1.4rem; }
 
-    .chip-group { gap: 8px; }
-    .chip-face { min-height: 26px; min-width: 88px; padding: 3px 13px; font-size: 0.9rem; }
-    .chip input:checked + .chip-face { padding: 2px 12px; }
+    #ratioGroup { display: none; }
+    .ratio-print-value {
+      display: block;
+      font-family: "Shippori Mincho", serif;
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 1.15rem;
+    }
 
     .inline-field { margin-bottom: 5px; }
     .fill-blank { min-height: 24px; font-size: 1.05rem; padding: 1px 4px; }
@@ -800,6 +811,7 @@
           <span class="chip-face"><span class="chip-check">✓&nbsp;</span>3 : 7<small>実技系など</small></span>
         </label>
       </div>
+      <p class="ratio-print-value" id="ratioPrintValue"></p>
     </section>
 
     <section class="step" id="step4">
@@ -1041,7 +1053,7 @@ function buildGradeSelect(id) {
   for (let v = 5; v >= 1; v--) {
     opts += `<option value="${v}" ${v === 3 ? "selected" : ""}>${v}</option>`;
   }
-  return `<select id="${id}" class="grade-select">${opts}</select>`;
+  return `<select id="${id}" class="grade-select">${opts}</select><span class="grade-print-value" id="${id}_print"></span>`;
 }
 
 function initGradeInputs() {
@@ -1152,6 +1164,24 @@ function calcAndRender() {
   }
 
   renderSchoolResult();
+  syncPrintMirrors();
+}
+
+function syncPrintMirrors() {
+  MAIN_SUBJECTS.forEach((_, i) => {
+    const valueEl = document.getElementById(`main_${i}_print`);
+    if (valueEl) valueEl.textContent = document.getElementById(`main_${i}`).value;
+  });
+  SKILL_SUBJECTS.forEach((_, i) => {
+    const valueEl = document.getElementById(`skill_${i}_print`);
+    if (valueEl) valueEl.textContent = document.getElementById(`skill_${i}`).value;
+  });
+
+  const checkedRatio = document.querySelector('input[name="ratio"]:checked');
+  const ratioPrintEl = document.getElementById("ratioPrintValue");
+  if (checkedRatio && ratioPrintEl) {
+    ratioPrintEl.textContent = `学力検査 : 調査書 = ${checkedRatio.value}`;
+  }
 }
 
 let selectedSchool = null;
